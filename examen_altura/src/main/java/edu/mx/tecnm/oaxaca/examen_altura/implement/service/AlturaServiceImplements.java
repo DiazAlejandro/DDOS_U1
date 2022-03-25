@@ -27,7 +27,7 @@ public class AlturaServiceImplements implements AlturaService {
 
     @Override
     public void registrarAltura(AlturaModel altura) {
-        altura.setIca(calculo.ica(altura.getAltura(), altura.getCintura()));
+        altura.setIca(Math.round((calculo.ica(altura.getAltura(), altura.getCintura()))*100.00)/100.0);
         altura.setNivel(calculo.nivel(
             calculo.ica(altura.getAltura(), altura.getCintura()), 
             altura.getGenero())
