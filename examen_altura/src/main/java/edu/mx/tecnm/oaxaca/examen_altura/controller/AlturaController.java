@@ -39,24 +39,22 @@ public class AlturaController {
 
         CustomResponse customResponse = new CustomResponse();
         Calculo alt = new Calculo();
-        //Caso 1: Recibe como parámetro un numero de control -> buscar si existe y si existe retornar el ica
-        if (altura.getNoControl() == 0) {
-            customResponse.setHttpCode(404);
-            customResponse.setMensaje("Sin Número de control");
-        }
-        if (altura.getNoControl() != 0) {
-            customResponse.setData(getAltura(altura.getNoControl()));
-        }
-        //Caso 2: Si los datos son incompletos (altura || cintura || sexo) -> decir que faltan datos
-        if (altura.getAltura() == 0
+
+        if (altura.getNoControl() == null) 
+            customResponse.setMensaje("Número de control obligatorio");
+        
+        if (altura.getNoControl() != 0 && (altura.getAltura() == 0
                 || altura.getCintura() == 0
-                || (altura.getGenero() + "").isEmpty()) {
-            customResponse.setHttpCode(202);
-            customResponse.setMensaje("DATOS INCOMPLETOS PARA REALIZAR UN CALCULO \n SOLO SE REALIZA CONSULTA");
-        }else{
-            customResponse.setHttpCode(404);
-            customResponse.setMensaje("SIN REGISTROS");
+                || (altura.getGenero() + "").isEmpty())) {
+            if (getAltura(altura.getNoControl()).getData() == null) {
+                customResponse.setMensaje("No existe registros con ese numero de control");
+            } else {
+                customResponse.setData(getAltura(altura.getNoControl()));
+                customResponse.setMensaje("Está consultando un número de control - Datos incompletos: No se puede realizar algún calculo");
+
+            }
         }
+
         //Caso 3: Flujo normal -> cuando hay todos los datos
         if (altura.getNoControl() != 0
                 && altura.getAltura() != 0
@@ -72,8 +70,8 @@ public class AlturaController {
             alt.setIca(ica_rounded);
             alt.setNivel(nivel);
             customResponse.setData(alt);
+            customResponse.setMensaje("Se registraron nuevos datos ");
             alturaService.registrarAltura(altura);
-
         }
 
         return customResponse;
